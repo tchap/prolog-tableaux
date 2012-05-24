@@ -1,5 +1,5 @@
 %%%
-%%% Method of analytic tableaux for propositional logic
+%%% Method of analytic tableaux for a propositional logic
 %%%
 
 %%% satisfiable(+Formulae)
