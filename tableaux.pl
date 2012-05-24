@@ -4,10 +4,14 @@
 
 %% satisfiable(+Formulae)
 %
-% Input: a set of formulas in the negative normal form
+% Input: a set of formulas in the negative normal form,
+% 	 variables are Prolog variables
 % 	 (at the moment only 'not', 'and', 'or' are allowed, no implication)
 %
+%
 % Output: succeeds if the set of formulas is satisfiable, fails otherwise
+%
+% Example: satisfiable(and(X, Y), not(X)) -> fail
 satisfiable(Formulae) :-
 	\+ closed_tableau(Formulae).
 
