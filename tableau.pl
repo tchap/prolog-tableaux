@@ -12,7 +12,7 @@ closed_tableau([X|Set]) :-
 	!.
 
 closed_tableau([X|Set]) :-
-	\+ var(X),
+	nonvar(X),
 	closed_tableau_b([X|Set]),
 	!.
 
