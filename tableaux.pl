@@ -2,6 +2,12 @@
 %%% Method of analytic tableaux for propositional logic
 %%%
 
+%% satisfiable(+Formulae)
+%
+% Input: a set of formulas in negative normal form
+% 	 (at the moment only 'not', 'and', 'or' is allowed, no implication)
+%
+% Output: succeeds if the set of formulas is satisfiable, fails otherwise
 satisfiable(Formulae) :-
 	\+ closed_tableau(Formulae).
 
