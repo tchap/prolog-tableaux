@@ -2,20 +2,20 @@
 %%% Method of analytic tableaux for propositional logic
 %%%
 
-%% satisfiable(+Formulae)
+%%% satisfiable(+Formulae)
 %
-% Input: a set of formulas in the negative normal form,
+%% Input: a set of formulas in the negative normal form,
 % 	 variables are Prolog variables
 % 	 (at the moment only 'not', 'and', 'or' are allowed, no implication)
 %
 %
-% Output: succeeds if the set of formulas is satisfiable, fails otherwise
+%% Output: succeeds if the set of formulas is satisfiable, fails otherwise
 %
-% Example: satisfiable(and(X, Y), not(X)) -> fail
+%% Example: satisfiable(and(X, Y), not(X)) -> fail
 satisfiable(Formulae) :-
 	\+ closed_tableau(Formulae).
 
-%% closed_tableau(+Formulae)
+%%% closed_tableau(+Formulae)
 
 % If an unbound variable is encountered, mark it as 'continue'.
 % The next time we encounter it we see either 'continue' and we skip it,
@@ -30,7 +30,7 @@ closed_tableau([X|Set]) :-
 	nonvar(X),
 	closed_tableau_b([X|Set]).
 
-%% closed_tableau_b(+Formulae)
+%%% closed_tableau_b(+Formulae)
 %
 % closed_tableau for bound variables
 
@@ -41,6 +41,8 @@ closed_tableau_b([stop|_]).
 closed_tableau_b([continue|Set]) :-
 	closed_tableau(Set).
 
+%% NOT rule
+
 % 'not(continue)' ~ 'stop'
 closed_tableau_b([not(continue)|_]).
 
@@ -50,11 +52,11 @@ closed_tableau_b([not(X)|Set]) :-
 	X = stop,
 	closed_tableau(Set).
 
-% AND rule, just serialize the formulas.
+%% AND rule, just serialize the formulas.
 closed_tableau_b([and(Phi,Psi)|Set]) :- 
 	closed_tableau([Phi,Psi|Set]).
 
-% OR rule, create a new branch.
+%% OR rule, create a new branch.
 closed_tableau_b([or(Phi,Psi)|Set]) :-
 	closed_tableau([Phi|Set]),
 	closed_tableau([Psi|Set]).
