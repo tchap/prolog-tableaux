@@ -2,6 +2,69 @@
 %%% Method of analytic tableaux for a propositional logic
 %%%
 
+%%% Some usable boolean operators.
+:- op(200, fy, $).
+:- op(210, yfx, &).
+:- op(220, yfx, v).
+:- op(230, xfy, =>).
+:- op(240, xfx, <=>).
+
+%%% ent(+Formula, -FormalaNNT)
+%
+% Convert Formula to the NNT and get rid of implication and ekvivalence.
+% Sorry for a few red cuts...
+
+%%% TODO: BUG
+% ?- ennt($X, NNT).
+% ERROR: variable `X' does not exist
+
+ennt(X, X) :-
+	var(X),
+	!.
+
+ennt($X, $X) :-
+	var(X),
+	!.
+
+ennt(Phi, PhiNNT) :-
+	ennt_b(Phi, PhiNNT).
+
+ennt_b(Phi <=> Psi, NNT) :-
+	ennt_b(Phi => Psi & Psi => Phi, NNT).
+
+ennt_b(Phi => Psi, NNT) :-
+	ennt_b($Phi v Psi, NNT).
+
+ennt_b($($Psi), PsiNNT) :-
+	ennt(Psi, PsiNNT).
+
+ennt_b(Phi & Psi, PhiNNT & PsiNNT) :-
+	ennt(Phi, PhiNNT),
+	ennt(Psi, PsiNNT).
+
+ennt_b($(Phi & Psi), PhiNNT v PsiNNT) :-
+	ennt($Phi, PhiNNT),
+	ennt($Psi, PsiNNT).
+
+ennt_b(Phi v Psi, PhiNNT v PsiNNT) :-
+	ennt(Phi, PhiNNT),
+	ennt(Psi, PsiNNT).
+
+ennt_b($(Phi v Psi), PhiNNT & PsiNNT) :-
+	ennt($Phi, PhiNNT),
+	ennt($Psi, PsiNNT).
+
+%%% map(+Function, +List, -MappedList)
+%
+% map function as we know it from functional programming;
+% returns the list reversed, but that's not a problem for us
+
+map(_, [], Acc, Acc).
+map(Function, [H|T], Acc, Res) :-
+	F =..[Function, H, MH],
+	call(F),
+	map(Function, T, [MH|Acc], Res).
+
 %%% satisfiable(+Formulae)
 %
 %% Input: a set of formulas in the negative normal form,
@@ -13,7 +76,8 @@
 %
 %% Example: satisfiable(and(X, Y), not(X)) -> fail
 satisfiable(Formulae) :-
-	\+ closed_tableau(Formulae).
+	map(ennt, Formulae, FormulaeNNT),
+	\+ closed_tableau(FormulaeNNT).
 
 %%% closed_tableau(+Formulae)
 
@@ -44,19 +108,19 @@ closed_tableau_b([continue|Set]) :-
 %% NOT rule
 
 % 'not(continue)' ~ 'stop'
-closed_tableau_b([not(continue)|_]).
+closed_tableau_b([$continue|_]).
 
 % If we encounter 'not(X)', we set X to stop, because the next time we see it,
 % we can safely close the branch.
-closed_tableau_b([not(X)|Set]) :-
+closed_tableau_b([$X|Set]) :-
 	X = stop,
 	closed_tableau(Set).
 
 %% AND rule, just serialize the formulas.
-closed_tableau_b([and(Phi,Psi)|Set]) :- 
+closed_tableau_b([Phi & Psi|Set]) :- 
 	closed_tableau([Phi,Psi|Set]).
 
 %% OR rule, create a new branch.
-closed_tableau_b([or(Phi,Psi)|Set]) :-
+closed_tableau_b([Phi v Psi|Set]) :-
 	closed_tableau([Phi|Set]),
 	closed_tableau([Psi|Set]).
