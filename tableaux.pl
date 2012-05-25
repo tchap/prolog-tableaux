@@ -2,7 +2,7 @@
 %%% Method of analytic tableaux for a propositional logic
 %%%
 
-%%% Some usable boolean operators.
+%%% Some useful boolean operators.
 :- op(200, fy, $).
 :- op(210, yfx, &).
 :- op(220, yfx, v).
