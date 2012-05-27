@@ -39,7 +39,7 @@ tautology(Formula) :-
 %% Input: any formula of a propositional logic
 %
 %% Output: the formula converted into the NNT;
-%	   implications and equivalences are also taken care of
+%	   it also takes care of implications and equivalences
 %
 %% Example:
 % ?- nnt((X => (Y => Z)) => ((X => Y) => (X => Z)), NNT).
