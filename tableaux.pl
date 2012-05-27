@@ -18,7 +18,7 @@
 %
 %% Output: succeeds if the set of formulas is satisfiable, fails otherwise
 %
-%% Example: satisfiable(and(X, Y), not(X)) -> fail
+%% Example: satisfiable(X & Y, non X) -> fail
 satisfiable(Formulae) :-
 	map(nnt, Formulae, FormulaeNNT),
 	\+ closed_tableau(FormulaeNNT).
