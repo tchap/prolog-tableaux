@@ -3,67 +3,11 @@
 %%%
 
 %%% Some useful boolean operators.
-:- op(200, fy, $).
+:- op(200, fy, non).
 :- op(210, yfx, &).
 :- op(220, yfx, v).
 :- op(230, xfy, =>).
 :- op(240, xfx, <=>).
-
-%%% ent(+Formula, -FormalaNNT)
-%
-% Convert Formula to the NNT and get rid of implication and ekvivalence.
-% Sorry for a few red cuts...
-
-%%% TODO: BUG
-% ?- ennt($X, NNT).
-% ERROR: variable `X' does not exist
-
-ennt(X, X) :-
-	var(X),
-	!.
-
-ennt($X, $X) :-
-	var(X),
-	!.
-
-ennt(Phi, PhiNNT) :-
-	ennt_b(Phi, PhiNNT).
-
-ennt_b(Phi <=> Psi, NNT) :-
-	ennt_b(Phi => Psi & Psi => Phi, NNT).
-
-ennt_b(Phi => Psi, NNT) :-
-	ennt_b($Phi v Psi, NNT).
-
-ennt_b($($Psi), PsiNNT) :-
-	ennt(Psi, PsiNNT).
-
-ennt_b(Phi & Psi, PhiNNT & PsiNNT) :-
-	ennt(Phi, PhiNNT),
-	ennt(Psi, PsiNNT).
-
-ennt_b($(Phi & Psi), PhiNNT v PsiNNT) :-
-	ennt($Phi, PhiNNT),
-	ennt($Psi, PsiNNT).
-
-ennt_b(Phi v Psi, PhiNNT v PsiNNT) :-
-	ennt(Phi, PhiNNT),
-	ennt(Psi, PsiNNT).
-
-ennt_b($(Phi v Psi), PhiNNT & PsiNNT) :-
-	ennt($Phi, PhiNNT),
-	ennt($Psi, PsiNNT).
-
-%%% map(+Function, +List, -MappedList)
-%
-% map function as we know it from functional programming;
-% returns the list reversed, but that's not a problem for us
-
-map(_, [], Acc, Acc).
-map(Function, [H|T], Acc, Res) :-
-	F =..[Function, H, MH],
-	call(F),
-	map(Function, T, [MH|Acc], Res).
 
 %%% satisfiable(+Formulae)
 %
@@ -76,8 +20,86 @@ map(Function, [H|T], Acc, Res) :-
 %
 %% Example: satisfiable(and(X, Y), not(X)) -> fail
 satisfiable(Formulae) :-
-	map(ennt, Formulae, FormulaeNNT),
+	map(nnt, Formulae, FormulaeNNT),
 	\+ closed_tableau(FormulaeNNT).
+
+%%% tautology(+Formula)
+%
+%% Output: succeeds if the Formula is a tautogy, fails otherwise
+tautology(Formula) :-
+	nnt(non(Formula), NNT),
+	closed_tableau([NNT]).
+
+%%% ent(+Formula, -FormalaNNT)
+%
+% Convert Formula to the NNT and get rid of implication and ekvivalence.
+% Sorry for a few red cuts, most of them are green, though...
+
+nnt(X, X) :-
+	var(X),
+	!.
+
+nnt(non X, non X) :-
+	var(X),
+	!.
+
+nnt(Phi, PhiNNT) :-
+	nnt_b(Phi, PhiNNT),
+	!.
+
+nnt_b(Phi <=> Psi, NNT) :-
+	nnt_b(Phi => Psi & Psi => Phi, NNT),
+	!.
+
+nnt_b(non(Phi <=> Psi), NNT) :-
+	nnt_b(non(Phi => Psi & Psi => Phi), NNT),
+	!.
+
+nnt_b(Phi => Psi, NNT) :-
+	nnt_b(non Phi v Psi, NNT),
+	!.
+
+nnt_b(non(Phi => Psi), NNT) :-
+	nnt_b(non(non Phi v Psi), NNT),
+	!.
+
+nnt_b(non non Psi, PsiNNT) :-
+	nnt(Psi, PsiNNT),
+	!.
+
+nnt_b(Phi & Psi, PhiNNT & PsiNNT) :-
+	nnt(Phi, PhiNNT),
+	nnt(Psi, PsiNNT),
+	!.
+
+nnt_b(non(Phi & Psi), PhiNNT v PsiNNT) :-
+	nnt(non Phi, PhiNNT),
+	nnt(non Psi, PsiNNT),
+	!.
+
+nnt_b(Phi v Psi, PhiNNT v PsiNNT) :-
+	nnt(Phi, PhiNNT),
+	nnt(Psi, PsiNNT),
+	!.
+
+nnt_b(non(Phi v Psi), PhiNNT & PsiNNT) :-
+	nnt(non Phi, PhiNNT),
+	nnt(non Psi, PsiNNT),
+	!.
+
+%%% map(+Function, +List, -MappedList)
+%
+% map function as we know it from functional programming;
+% returns the list reversed, but that's not a problem for us
+
+map(Function, List, MappedList) :-
+	map(Function, List, [], MappedList).
+
+map(_, [], Acc, Acc).
+map(Function, [H|T], Acc, Res) :-
+	F =..[Function, H, MH],
+	call(F),
+	map(Function, T, [MH|Acc], Res).
 
 %%% closed_tableau(+Formulae)
 
@@ -108,11 +130,11 @@ closed_tableau_b([continue|Set]) :-
 %% NOT rule
 
 % 'not(continue)' ~ 'stop'
-closed_tableau_b([$continue|_]).
+closed_tableau_b([non continue|_]).
 
 % If we encounter 'not(X)', we set X to stop, because the next time we see it,
 % we can safely close the branch.
-closed_tableau_b([$X|Set]) :-
+closed_tableau_b([non X|Set]) :-
 	X = stop,
 	closed_tableau(Set).
 
