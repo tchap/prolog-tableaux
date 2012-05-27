@@ -26,6 +26,10 @@ satisfiable(Formulae) :-
 %%% tautology(+Formula)
 %
 %% Output: succeeds if the Formula is a tautogy, fails otherwise
+%
+%% Example:
+% ?- tautology((X => (Y => Z)) => ((X => Y) => (X => Z))).
+% X = Y, Y = Z, Z = continue.
 tautology(Formula) :-
 	nnt(non(Formula), NNT),
 	closed_tableau([NNT]).
