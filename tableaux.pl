@@ -36,9 +36,14 @@ tautology(Formula) :-
 
 %%% ent(+Formula, -FormalaNNT)
 %
-% Convert Formula to the NNT and get rid of implication and ekvivalence.
-% Sorry for a few red cuts, most of them are green, though...
-
+%% Input: any formula of a propositional logic
+%
+%% Output: the formula converted into the NNT,
+%	   including getting rid of implications and equivalences
+%
+%% Example:
+% ?- nnt((X => (Y => Z)) => ((X => Y) => (X => Z)), NNT).
+% NNT = X& (Y&non Z)v (X&non Y v (non X v Z)).
 nnt(X, X) :-
 	var(X),
 	!.
