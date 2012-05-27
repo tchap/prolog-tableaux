@@ -27,12 +27,6 @@ satisfiable(Formulae) :-
 %
 %% Output: succeeds if the Formula is a tautogy, fails otherwise
 %
-%% Example:
-% ?- tautology((X => X) & Y).
-% Closing branch [1,non 1]
-% Failed to close branch [non 2] -> FAIL
-% X = continue 1,
-% Y = stop 2.
 tautology(Formula) :-
 	nnt(non(Formula), NNT),
 	closed_tableau([NNT]).
@@ -124,11 +118,11 @@ closed_tableau(Formulae) :-
 
 % We failed to close a branch if there are no more formulas we can use.
 closed_tableau_(Branch, []) :-
-	format('Branch: ~w~n', [Branch]),
-	format('Next: none~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: none~n"),
 	format("    -> failed to close the branch~n"),
-	format('Unused formulas: ~w~n', [[]]),
-	format('---------------------------------------------------------~n'),
+	format("Unused formulas: ~w~n", [[]]),
+	format("---------------------------------------------------------~n"),
 	fail.
 
 % If an unbound variable is encountered, mark it as 'continue'.
@@ -136,16 +130,16 @@ closed_tableau_(Branch, []) :-
 % or we see 'not(continue)' and we close the branch.
 closed_tableau_(Branch, [X|Set]) :-
 	var(X),
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [X]),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [X]),
 	b_getval(marker, Marker),
 	NextMarker is Marker + 1,
 	b_setval(marker, NextMarker),
 	X = continue NextMarker,
-	format('    -> a new variable encountered, name it ~w~n', [NextMarker]),
-	format('    -> the literal is positive, mark it to be skipped~n'),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("    -> a new variable encountered, name it ~w~n", [NextMarker]),
+	format("    -> the literal is positive, mark it to be skipped~n"),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	closed_tableau_([NextMarker|Branch], Set),
 	!.
 
@@ -153,16 +147,16 @@ closed_tableau_(Branch, [X|Set]) :-
 % we can safely close the branch.
 closed_tableau_(Branch, [non X|Set]) :-
 	var(X),
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [non X]),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [non X]),
 	b_getval(marker, Marker),
 	NextMarker is Marker + 1,
 	b_setval(marker, NextMarker),
 	X = stop NextMarker,
-	format('    -> a new variable encountered, name it ~w~n', [NextMarker]),
-	format('    -> the literal is negative, mark it to close branches~n'),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("    -> a new variable encountered, name it ~w~n", [NextMarker]),
+	format("    -> the literal is negative, mark it to close branches~n"),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	( 
 		  (closed_tableau_([non NextMarker|Branch], Set), !) 
 		; (!, fail)
@@ -179,62 +173,62 @@ closed_tableau_(Branch, [X|Set]) :-
 
 % If we encounter 'stop', we just close the branch.
 closed_tableau_b(Branch, [stop Marker|Set]) :-
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [stop Marker]),
-	format('    -> CLOSE BRANCH ~w~n', [[Marker|Branch]]),
-	format('Unused formulas: ~w~n', [[stop Marker|Set]]),
-	format('---------------------------------------------------------~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [stop Marker]),
+	format("    -> CLOSE BRANCH ~w~n", [[Marker|Branch]]),
+	format("Unused formulas: ~w~n", [[stop Marker|Set]]),
+	format("---------------------------------------------------------~n"),
 	!.
 
 % non continue ~ stop
 closed_tableau_b(Branch, [non continue Marker|Set]) :-
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [non continue Marker]),
-	format('    -> CLOSE BRANCH ~w~n', [[Marker|Branch]]),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [non continue Marker]),
+	format("    -> CLOSE BRANCH ~w~n", [[Marker|Branch]]),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	!.
 
 % If we encounter 'continue', we just skip it, because we have seen it already.
 closed_tableau_b(Branch, [continue Marker|Set]) :-
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [continue Marker]),
-	format('    -> skip~n'),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [continue Marker]),
+	format("    -> skip~n"),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	closed_tableau_([Marker|Branch], Set),
 	!.
 
 % non stop ~ continue
 closed_tableau_b(Branch, [non stop Marker|Set]) :-
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [non stop Marker]),
-	format('    -> skip~n'),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [non stop Marker]),
+	format("    -> skip~n"),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	closed_tableau_([Marker|Branch], Set),
 	!.
 
 %% AND rule, just serialize the formulas.
 closed_tableau_b(Branch, [Phi & Psi|Set]) :- 
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [Phi & Psi]),
-	format('    -> serialize following:~n'),
-	format('        ~w~n', [Phi]),
-	format('        ~w~n', [Psi]),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [Phi & Psi]),
+	format("    -> serialize following:~n"),
+	format("        ~w~n", [Phi]),
+	format("        ~w~n", [Psi]),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	closed_tableau_(Branch, [Phi,Psi|Set]),
 	!.
 
 %% OR rule, create a new branch.
 closed_tableau_b(Branch, [Phi v Psi|Set]) :-
-	format('Branch: ~w~n', [Branch]),
-	format('Next: ~w~n', [Phi v Psi]),
-	format('    -> apply OR rule - create branches for:~n'),
-	format('        ~w~n', [Phi]),
-	format('        ~w~n', [Psi]),
-	format('Unused formulas: ~w~n', [Set]),
-	format('---------------------------------------------------------~n'),
+	format("Branch: ~w~n", [Branch]),
+	format("Next: ~w~n", [Phi v Psi]),
+	format("    -> apply OR rule - create branches for:~n"),
+	format("        ~w~n", [Phi]),
+	format("        ~w~n", [Psi]),
+	format("Unused formulas: ~w~n", [Set]),
+	format("---------------------------------------------------------~n"),
 	closed_tableau_(Branch, [Phi|Set]),
 	closed_tableau_(Branch, [Psi|Set]).
