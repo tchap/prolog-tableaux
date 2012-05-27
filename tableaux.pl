@@ -2,6 +2,10 @@
 %%% Method of analytic tableaux for a propositional logic
 %%%
 
+%%
+%% I tried to keep as many cuts green, but didn't manage a few times.
+%%
+
 %%% Some useful boolean operators.
 :- op(200, fy, non).
 :- op(210, yfx, &).
