@@ -58,11 +58,11 @@ nnt(Phi, PhiNNT) :-
 	!.
 
 nnt_b(Phi <=> Psi, NNT) :-
-	nnt_b(Phi => Psi & Psi => Phi, NNT),
+	nnt_b((Phi => Psi) & (Psi => Phi), NNT),
 	!.
 
 nnt_b(non(Phi <=> Psi), NNT) :-
-	nnt_b(non(Phi => Psi & Psi => Phi), NNT),
+	nnt_b(non((Phi => Psi) & (Psi => Phi)), NNT),
 	!.
 
 nnt_b(Phi => Psi, NNT) :-
